@@ -106,6 +106,31 @@ class CourseControllerTest {
         }
 
         @Test
+        @DisplayName("Should return CourseDto with full=true when course has reached full capacity")
+        void shouldReturnCourseDtoWithFullTrueWhenCourseIsFull() {
+            // Arrange
+            Course fullCourse = new Course();
+            fullCourse.setId(2L);
+            fullCourse.setTitle("Cloud Computing");
+            fullCourse.setMaxCapacity(30);
+            fullCourse.setCurrentEnrollment(30);
+
+            when(courseRepo.findById(2L)).thenReturn(Optional.of(fullCourse));
+
+            // Act
+            CourseDto result = courseController.getCourse(2L);
+
+            // Assert
+            assertNotNull(result);
+            assertEquals(2L, result.id());
+            assertEquals("Cloud Computing", result.title());
+            assertEquals(30, result.maxCapacity());
+            assertEquals(30, result.currentEnrollment());
+            assertTrue(result.full());
+            verify(courseRepo, times(1)).findById(2L);
+        }
+
+        @Test
         @DisplayName("Should throw 404 NOT_FOUND when course is not found")
         void shouldThrowNotFoundWhenCourseMissing() {
             // Arrange

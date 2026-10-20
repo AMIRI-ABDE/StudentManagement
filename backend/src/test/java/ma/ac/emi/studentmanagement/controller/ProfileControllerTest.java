@@ -79,6 +79,7 @@ class ProfileControllerTest {
             assertEquals("David Updated", result.name());
             assertEquals(currentStudent.getId(), result.id());
             assertEquals(currentStudent.getEmail(), result.email());
+            assertEquals("STUDENT", result.role());
             verify(studentRepo, times(1)).save(currentStudent);
         }
     }

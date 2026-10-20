@@ -99,6 +99,15 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/*Tests.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.12</version>
@@ -124,6 +133,49 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>1.19.4</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.pitest</groupId>
+						<artifactId>pitest-junit5-plugin</artifactId>
+						<version>1.2.3</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<targetClasses>
+						<param>ma.ac.emi.studentmanagement.service.*</param>
+						<param>ma.ac.emi.studentmanagement.controller.*</param>
+						<param>ma.ac.emi.studentmanagement.entity.*</param>
+						<param>ma.ac.emi.studentmanagement.config.JwtService</param>
+						<param>ma.ac.emi.studentmanagement.config.GlobalExceptionHandler</param>
+					</targetClasses>
+					<targetTests>
+						<param>ma.ac.emi.studentmanagement.*Test</param>
+					</targetTests>
+					<excludedClasses>
+						<param>ma.ac.emi.studentmanagement.StudentManagementApplication</param>
+						<param>ma.ac.emi.studentmanagement.DataLoader</param>
+						<param>ma.ac.emi.studentmanagement.config.SecurityConfig</param>
+						<param>ma.ac.emi.studentmanagement.config.JwtAuthenticationFilter</param>
+					</excludedClasses>
+					<excludedTestClasses>
+						<param>ma.ac.emi.studentmanagement.*Tests</param>
+					</excludedTestClasses>
+					<outputFormats>
+						<outputFormat>HTML</outputFormat>
+						<outputFormat>XML</outputFormat>
+						<outputFormat>CSV</outputFormat>
+					</outputFormats>
+					<mutators>
+						<mutator>ALL</mutator>
+					</mutators>
+					<verbose>true</verbose>
+					<timestampedReports>false</timestampedReports>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
