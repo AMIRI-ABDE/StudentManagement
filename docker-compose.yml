@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: student-backend
+    restart: always
+    environment:
+      - JAVA_TOOL_OPTIONS=-Xmx384m -Xms128m
+    ports:
+      - "8080:8080"
+    networks:
+      - student-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: student-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - student-network
+
+networks:
+  student-network:
+    driver: bridge
