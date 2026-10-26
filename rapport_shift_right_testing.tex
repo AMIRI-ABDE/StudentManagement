@@ -1,0 +1,493 @@
+\documentclass[12pt,a4paper]{article}
+
+% ─────────────────────────────────────────────────────────────
+% PACKAGES ET CONFIGURATION
+% ─────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{amsmath,amssymb}
+
+% Couleurs personnalisées
+\definecolor{primaryblue}{RGB}{24, 76, 120}
+\definecolor{secondaryblue}{RGB}{41, 128, 185}
+\definecolor{accentgreen}{RGB}{39, 174, 96}
+\definecolor{accentred}{RGB}{192, 57, 43}
+\definecolor{lightgray}{gray}{0.96}
+\definecolor{codegray}{gray}{0.92}
+\definecolor{darkgray}{gray}{0.3}
+
+% Configuration des hyperliens
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primaryblue,
+    citecolor=secondaryblue,
+    urlcolor=secondaryblue,
+    pdftitle={Rapport Shift-Right Testing - StudentManagement},
+    pdfauthor={Équipe Software Testing}
+}
+
+% Configuration du style des pages
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{darkgray}{\small Shift-Right Testing : Déploiement Canary \& Feature Flags}}
+\fancyhead[R]{\textcolor{darkgray}{\small \thepage}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+\fancyfoot[C]{\textcolor{darkgray}{\footnotesize École Mohammadia d'Ingénieurs — Module Software Testing}}
+
+% Style des titres
+\titleformat{\section}
+  {\color{primaryblue}\normalfont\Large\bfseries}
+  {\color{primaryblue}\thesection}{1em}{}
+\titleformat{\subsection}
+  {\color{secondaryblue}\normalfont\large\bfseries}
+  {\color{secondaryblue}\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\color{darkgray}\normalfont\normalsize\bfseries}
+  {\color{darkgray}\thesubsubsection}{1em}{}
+
+% Configuration listings pour le code
+\lstset{
+    backgroundcolor=\color{lightgray},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    captionpos=b,
+    commentstyle=\color{accentgreen},
+    keywordstyle=\color{primaryblue}\bfseries,
+    stringstyle=\color{accentred},
+    numberstyle=\tiny\color{darkgray},
+    numbers=left,
+    numbersep=8pt,
+    showstringspaces=false,
+    frame=lines,
+    rulecolor=\color{secondaryblue},
+    tabsize=2
+}
+
+% Commande pour insérer un placeholder de capture d'écran
+\newcommand{\screenshotplaceholder}[2][7cm]{%
+  \begin{figure}[H]
+    \centering
+    \begin{tcolorbox}[
+      width=0.95\textwidth,
+      height=#1,
+      valign=center,
+      halign=center,
+      colback=lightgray,
+      colframe=secondaryblue!70,
+      boxrule=1.5pt,
+      dashed
+    ]
+      \centering
+      \vspace{0.2cm}
+      {\color{secondaryblue}\Huge\textbf{[\,CAPTURE D'ÉCRAN\,]}}\\[0.4cm]
+      {\color{darkgray}\large\textbf{#2}}\\[0.2cm]
+      {\small\textit{Emplacement réservé : insérez votre capture d'écran ici}}
+      \vspace{0.2cm}
+    \end{tcolorbox}
+    \caption{#2}
+    \label{fig:#2}
+  \end{figure}
+}
+
+% ─────────────────────────────────────────────────────────────
+% PAGE DE GARDE
+% ─────────────────────────────────────────────────────────────
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{0.5cm}
+    {\scshape\LARGE École Mohammadia d'Ingénieurs \par}
+    \vspace{0.3cm}
+    {\scshape\Large Département Génie Informatique \& Mathématiques Appliquées\par}
+    \vspace{1.5cm}
+
+    \rule{\linewidth}{0.6mm} \\[0.4cm]
+    {\huge\bfseries\color{primaryblue} RAPPORT DE PROJET \par}
+    \vspace{0.3cm}
+    {\LARGE\bfseries Shift-Right Testing en Production : Déploiement Canary, Feature Flags \& Rollback Automatique \par}
+    \rule{\linewidth}{0.6mm} \\[1.5cm]
+
+    \textbf{\Large Projet StudentManagement}\\[0.3cm]
+    {\large Spring Boot 4.1.1 — Angular 19 — Nginx — Unleash — k6 — AWS EC2}\\[2.5cm]
+
+    \begin{minipage}{0.48\textwidth}
+        \begin{flushleft} \large
+            \emph{Réalisé par :}\\
+            \textbf{Équipe de Test Logiciel}
+        \end{flushleft}
+    \end{minipage}
+    ~
+    \begin{minipage}{0.48\textwidth}
+        \begin{flushright} \large
+            \emph{Module :}\\
+            \textbf{Software Testing \& Qualité}\\
+            \emph{Semestre 5 (2026/2027)}
+        \end{flushright}
+    \end{minipage}
+
+    \vfill
+    {\large \today \par}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ─────────────────────────────────────────────────────────────
+% 1. INTRODUCTION & CONTEXTE
+% ─────────────────────────────────────────────────────────────
+\section{Introduction et Contexte du Projet}
+
+\subsection{Problématique du Shift-Right Testing}
+Traditionnellement, l'assurance qualité logicielle se concentre sur l'approche dite \textit{Shift-Left}, qui consiste à multiplier les tests au plus tôt dans le cycle de développement (tests unitaires, tests d'intégration, analyse statique). Bien qu'indispensable, cette approche ne garantit pas à elle seule l'absence de régressions ou de comportements inattendus lors de la mise en production réelle.
+
+Le \textbf{Shift-Right Testing} complète ce paradigme en étendant les pratiques de vérification, de test de charge, d'injection de pannes et d'observabilité directement sur l'environnement de production ou pré-production, au plus près des utilisateurs réels.
+
+\subsection{Contexte Applicatif et Contraintes Techniques}
+Le projet support de cette mise en œuvre est l'application \textbf{StudentManagement}, une plateforme de gestion académique composée d'une API REST Spring Boot (Java 21) et d'un frontend en Angular 19, conteneurisés via Docker Compose.
+
+Le cahier des charges impose la mise en œuvre d'une architecture résiliente sans surcoût d'infrastructure :
+\begin{itemize}
+    \item \textbf{Cible de déploiement} : Instance cloud AWS EC2 (gabarit restreint \texttt{t2.micro} / \texttt{t3.micro}, 1 vCPU, 1 Go RAM).
+    \item \textbf{Contrainte d'outillage} : Déploiement sans orchestration Kubernetes lourde, et sans stack de monitoring consommatrice (ni Prometheus, ni Grafana).
+    \item \textbf{Piliers fonctionnels à implémenter} :
+    \begin{enumerate}
+        \item \textbf{Canary Deployment} avec répartition pondérée du trafic ($90\%$ Stable / $10\%$ Canary).
+        \item \textbf{Feature Flags (Unleash)} pour l'activation dynamique de fonctionnalités et l'injection contrôlée de pannes.
+        \item \textbf{Observabilité & Health Checks} via Spring Boot Actuator.
+        \item \textbf{Tests de charge automatisés} via l'outil k6.
+        \item \textbf{Contrôleur de Rollback automatique} capable de basculer à chaud vers $100\%$ Stable en cas d'anomalie.
+    \end{enumerate}
+\end{itemize}
+
+% ─────────────────────────────────────────────────────────────
+% 2. ARCHITECTURE DE LA SOLUTION
+% ─────────────────────────────────────────────────────────────
+\section{Architecture Globale de la Solution}
+
+L'architecture repose sur la séparation claire des responsabilités entre le routage réseau, les instances applicatives versionnées et le système de configuration dynamique des feature flags.
+
+\begin{figure}[H]
+\centering
+\begin{tcolorbox}[colback=white, colframe=primaryblue!80, width=\textwidth, title=\textbf{Schéma Architectural du Déploiement Canary}]
+\centering
+\vspace{0.2cm}
+\begin{verbatim}
+                             Clients / Internet
+                                     │
+                                     ▼
+                          ┌─────────────────────┐
+                          │  student-nginx:80   │  (Reverse Proxy / Routeur Canary)
+                          └──────┬──────┬───────┘
+                                 │      │
+                  90% Trafic     │      │     10% Trafic
+             ┌───────────────────┘      └──────────────────┐
+             ▼                                             ▼
+  ┌──────────────────────┐                     ┌──────────────────────┐
+  │  student-backend-v1  │                     │  student-backend-v2  │
+  │   (Version Stable)   │                     │   (Version Canary)   │
+  └──────────┬───────────┘                     └──────────┬───────────┘
+             │                                            │
+             └───────────────────┬────────────────────────┘
+                                 │ Évaluation des toggles
+                                 ▼
+                      ┌──────────────────────┐
+                      │   student-unleash    │  ◄── Dashboard Web (:4242)
+                      │   (Feature Flags)    │
+                      └──────────┬───────────┘
+                                 │ Stockage persistant
+                                 ▼
+                      ┌──────────────────────┐
+                      │  student-unleash-db  │  (PostgreSQL 15)
+                      └──────────────────────┘
+\end{verbatim}
+\vspace{0.2cm}
+\end{tcolorbox}
+\caption{Topologie multi-conteneurs pour le Canary Testing}
+\label{fig:architecture}
+\end{figure}
+
+\subsection{Description des Rôles}
+\begin{enumerate}
+    \item \textbf{Nginx Reverse Proxy (\texttt{student-nginx})} : Point d'entrée unique sur le port 80. Il assure la distribution pondérée des requêtes API ($90\%$ vers V1, $10\%$ vers V2), achemine les requêtes d'actifs statiques vers le frontend Angular, et expose des routes directes sans canary pour les sondes Actuator (\texttt{/v1/actuator/} et \texttt{/v2/actuator/}).
+    \item \textbf{Backend V1 (\texttt{student-backend-v1})} : Version de référence en production, garantie stable. Elle dessert $90\%$ des utilisateurs.
+    \item \textbf{Backend V2 (\texttt{student-backend-v2})} : Version canary candidate recevant $10\%$ du trafic. Elle embarque le filtre d'injection de pannes conditionné par Unleash.
+    \item \textbf{Serveur Unleash (\texttt{student-unleash})} : Serveur de gestion de drapeaux de fonctionnalités, pilotable via API REST et interface graphique web sur le port 4242.
+    \item \textbf{Base de données PostgreSQL (\texttt{student-unleash-db})} : Stockage persistant pour la configuration des feature flags.
+\end{enumerate}
+
+\screenshotplaceholder[6cm]{État d'exécution des conteneurs avec docker-compose ps}
+
+% ─────────────────────────────────────────────────────────────
+% 3. IMPLÉMENTATION DES MODIFICATIONS
+% ─────────────────────────────────────────────────────────────
+\section{Implémentation Détaillée des Composants}
+
+\subsection{Évolution du Backend Spring Boot}
+
+\subsubsection{Dépendances Maven (\texttt{pom.xml})}
+Pour doter l'application de capacités d'observabilité et d'intégration avec Unleash, les modules suivants ont été intégrés :
+\begin{lstlisting}[language=XML]
+<!-- Spring Boot Actuator pour les sondes de sante -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+<!-- Client officiel Unleash pour Java -->
+<dependency>
+    <groupId>io.getunleash</groupId>
+    <artifactId>unleash-client-java</artifactId>
+    <version>9.2.6</version>
+</dependency>
+\end{lstlisting}
+
+\subsubsection{Traçabilité du Trafic : \texttt{VersionHeaderFilter}}
+Afin d'auditer et de mesurer précisément le routage canary depuis l'extérieur (tests k6, navigateur, scripts), un filtre HTTP de priorité maximale ajoute l'en-tête \texttt{X-Backend-Version} à chaque réponse :
+\begin{lstlisting}[language=Java]
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class VersionHeaderFilter extends OncePerRequestFilter {
+    @Value("${app.version}")
+    private String appVersion;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+        response.setHeader("X-Backend-Version", appVersion);
+        filterChain.doFilter(request, response);
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Injection de Pannes et Latence : \texttt{FailureInjectionFilter}}
+Ce filtre est le composant central des tests de résilience. Il applique le principe de moindre surprise :
+\begin{itemize}
+    \item Si l'instance est \texttt{v1}, aucune panne n'est jamais injectée.
+    \item Si l'instance est \texttt{v2} et que l'URI commence par \texttt{/api/}, il interroge Unleash :
+    \begin{itemize}
+        \item Si le flag \texttt{simulate-failure} est activé, une réponse HTTP 500 au format JSON est immédiatement retournée.
+        \item Si le flag \texttt{simulate-latency} est activé, un délai artificiel de 3000 ms est imposé avant de poursuivre la chaîne de filtres.
+    \end{itemize}
+\end{itemize}
+
+\begin{lstlisting}[language=Java]
+if ("v2".equals(appVersion) && request.getRequestURI().startsWith("/api/")) {
+    if (unleash.isEnabled("simulate-failure")) {
+        response.setStatus(500);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\":\"Simulated failure (canary test)\",\"version\":\"v2\"}");
+        return;
+    }
+    if (unleash.isEnabled("simulate-latency")) {
+        Thread.sleep(3000);
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Ouverture des Sondes Actuator (\texttt{SecurityConfig})}
+Dans \texttt{SecurityConfig.java}, la chaîne de filtres de sécurité a été modifiée pour autoriser les requêtes vers Actuator sans authentification JWT :
+\begin{lstlisting}[language=Java]
+.requestMatchers("/api/auth/**").permitAll()
+.requestMatchers("/actuator/**").permitAll() // Autorisation des sondes de sante
+.requestMatchers("/h2-console/**").permitAll()
+\end{lstlisting}
+
+\screenshotplaceholder[6cm]{Reponse du endpoint Actuator Health /v1/actuator/health et /v2/actuator/health}
+
+% ─────────────────────────────────────────────────────────────
+% 4. GESTION DES FEATURE FLAGS (UNLEASH)
+% ─────────────────────────────────────────────────────────────
+\section{Gestion des Feature Flags avec Unleash}
+
+\subsection{Configuration des Drapeaux}
+Dans le cadre de l'expérimentation, deux drapeaux de fonctionnalités de type \textit{Release} ont été créés dans le projet \texttt{default} d'Unleash :
+\begin{enumerate}
+    \item \texttt{simulate-failure} : Déclenche l'erreur HTTP 500 sur le backend canary.
+    \item \texttt{simulate-latency} : Déclenche une latence de 3 secondes sur le backend canary.
+\end{enumerate}
+
+\screenshotplaceholder[6.5cm]{Interface web Unleash (Port 4242) avec les drapeaux simulate-failure et simulate-latency}
+
+\subsection{Sécurité et Jetons d'API}
+Le déploiement utilise des tokens initialisés dès le démarrage du conteneur via les variables d'environnement de Docker Compose :
+\begin{itemize}
+    \item \textbf{Token Admin} (\texttt{*:*.unleash-insecure-admin-api-token}) : Permet le pilotage automatisé et les appels curl.
+    \item \textbf{Token Client} (\texttt{default:development.unleash-insecure-api-token}) : Utilisé par le SDK Java des backends.
+    \item \textbf{Identifiants Web} : Nom d'utilisateur \texttt{admin}, mot de passe par défaut \texttt{unleash4all}.
+\end{itemize}
+
+\screenshotplaceholder[6cm]{Activation du feature flag simulate-failure dans l'environnement development}
+
+% ─────────────────────────────────────────────────────────────
+% 5. TESTS DE CHARGE AVEC K6
+% ─────────────────────────────────────────────────────────────
+\section{Tests de Charge et Validation du Canary avec k6}
+
+\subsection{Objectifs du Test}
+Le test de charge réalisé avec \textbf{k6} vise à :
+\begin{enumerate}
+    \item Valider empiriquement le ratio de routage de Nginx ($90\%$ vers V1 et $10\%$ vers V2).
+    \item Mesurer le temps de réponse sous charge concurrente.
+    \item Confirmer le respect des seuils de qualité (SLA) : $p(95) < 2000\,\text{ms}$ et taux d'erreurs $< 10\%$.
+\end{enumerate}
+
+\subsection{Scénario de Test (\texttt{scripts/k6-load-test.js})}
+Le script simule 5 utilisateurs virtuels (VUs) envoyant des requêtes d'authentification en continu pendant 30 secondes :
+\begin{lstlisting}[language=JavaScript]
+export const options = {
+    scenarios: {
+        normal_traffic: {
+            executor: 'constant-vus',
+            vus: 5,
+            duration: '30s',
+            exec: 'normalTraffic',
+        },
+    },
+    thresholds: {
+        http_req_duration: ['p(95)<2000'],
+        errors: ['rate<0.1'],
+    },
+};
+\end{lstlisting}
+
+\subsection{Résultats Obtenus}
+L'exécution sous conteneur k6 a produit les résultats chiffrés suivants :
+\begin{table}[H]
+\centering
+\caption{Bilan de l'exécution du test de charge k6}
+\begin{tabularx}{0.85\textwidth}{l X r}
+\toprule
+\textbf{Métrique} & \textbf{Description} & \textbf{Valeur Observée} \\
+\midrule
+Total Requêtes & Volume global traité en 30s & \textbf{150 requêtes} \\
+Distribution V1 & Requêtes traitées par le backend stable & \textbf{90.00\%} (135 req) \\
+Distribution V2 & Requêtes traitées par le backend canary & \textbf{10.00\%} (15 req) \\
+Taux d'erreur & Requêtes en statut HTTP $\ge 500$ & \textbf{0.00\%} \\
+Latence Moyenne & Temps de réponse moyen & \textbf{11.26 ms} \\
+Latence $p(95)$ & 95e percentile de la durée & \textbf{13.96 ms} (Seuil $< 2000$ ms) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\screenshotplaceholder[7cm]{Rapport d'execution du test de charge k6 affichant la repartition 90/10 et les percentiles}
+
+% ─────────────────────────────────────────────────────────────
+% 6. ROLLBACK AUTOMATIQUE
+% ─────────────────────────────────────────────────────────────
+\section{Contrôleur de Rollback Automatique}
+
+\subsection{Fonctionnement de l'Agent Watchdog}
+Le script \texttt{scripts/rollback-controller.sh} agit comme un chien de garde (watchdog). Il sonde périodiquement le backend canary V2 :
+\begin{enumerate}
+    \item Il vérifie la sonde Actuator (\texttt{/actuator/health}).
+    \item Il évalue le taux d'erreur sur un lot de requêtes tests envoyées directement à V2.
+    \item Si le taux d'erreur dépasse le seuil configuré ($5\%$) pendant $N$ vérifications consécutives ($N=3$), le script déclenche le rollback.
+\end{enumerate}
+
+\subsection{Mécanisme de Bascule à Chaud}
+L'opération de rollback ne nécessite aucun arrêt de conteneur, garantissant l'absence de coupure de service (\textit{zero downtime}) :
+\begin{lstlisting}[language=bash]
+do_rollback() {
+    log "ROLLBACK TRIGGERED: Removing V2 from Nginx routing"
+    # Remplacement a chaud de la configuration Nginx
+    docker cp nginx/nginx-rollback.conf student-nginx:/etc/nginx/conf.d/default.conf
+    # Rechargement gracieux des processus workers
+    docker exec student-nginx nginx -s reload
+    log "ROLLBACK COMPLETE: All traffic now routed to V1"
+}
+\end{lstlisting}
+
+\screenshotplaceholder[6.5cm]{Execution du rollback-controller detectant l anomalie et appliquant le rollback}
+
+\subsection{Validation du Rétablissement Post-Rollback}
+Après déclenchement du rollback alors même que la panne simulée était maintenue active sur V2 :
+\begin{itemize}
+    \item 30 requêtes consécutives ont été envoyées sur le point d'entrée public de l'API.
+    \item \textbf{Résultat} : $100\%$ des requêtes ont retourné \texttt{HTTP 200 OK} avec l'en-tête \texttt{X-Backend-Version: v1}.
+    \item Les utilisateurs finaux ont été complètement isolés de la régression.
+\end{itemize}
+
+\screenshotplaceholder[6cm]{Verification du trafic post-rollback (100 pourcent V1 et 0 erreur utilisateur)}
+
+% ─────────────────────────────────────────────────────────────
+% 7. SCÉNARIO DE DÉMONSTRATION DE BOUT EN BOUT
+% ─────────────────────────────────────────────────────────────
+\section{Scénario de Démonstration de Bout en Bout}
+
+Le script interactif \texttt{scripts/demo-shift-right.sh} regroupe l'ensemble du cycle de vie du Shift-Right Testing :
+\begin{enumerate}
+    \item \textbf{Étape 1} : Audit de santé initial de V1 et V2.
+    \item \textbf{Étape 2} : Test de conformité du routage canary ($90/10$).
+    \item \textbf{Étape 3} : Activation de l'injection de panne dans Unleash.
+    \item \textbf{Étape 4} : Observation de l'apparition des erreurs HTTP 500 sur V2.
+    \item \textbf{Étape 5} : Déclenchement automatique du contrôleur de rollback et rétablissement du service.
+\end{enumerate}
+
+\screenshotplaceholder[7cm]{Execution complete du script de demonstration demo-shift-right.sh}
+
+% ─────────────────────────────────────────────────────────────
+% 8. DÉPLOIEMENT SUR AWS EC2
+% ─────────────────────────────────────────────────────────────
+\section{Guide de Déploiement Cloud (AWS EC2)}
+
+\subsection{Configuration de l'Instance}
+Le script \texttt{deploy-ec2.sh} assure l'automatisation complète de la configuration d'une instance Ubuntu neuve :
+\begin{enumerate}
+    \item \textbf{Allocation d'un Swap de 2 Go} : Indispensable pour éviter les erreurs \textit{Out Of Memory (OOM)} lors des compilations Maven sur machine \texttt{t2.micro}.
+    \item \textbf{Installation de Docker et Docker Compose}.
+    \item \textbf{Configuration des permissions} sur les scripts.
+    \item \textbf{Construction et démarrage} des 6 conteneurs.
+\end{enumerate}
+
+\subsection{Règles du Groupe de Sécurité AWS}
+\begin{table}[H]
+\centering
+\caption{Configuration des flux réseau entrants (Security Group)}
+\begin{tabular}{llll}
+\toprule
+\textbf{Port} & \textbf{Protocole} & \textbf{Source} & \textbf{Description} \\
+\midrule
+22 & TCP & Votre IP /32 & Administration sécurisée via SSH \\
+80 & TCP & 0.0.0.0/0 & Accès public Application \& API Canary \\
+4242 & TCP & Votre IP /32 & Tableau de bord Unleash Feature Flags \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\screenshotplaceholder[6cm]{Console AWS EC2 montrant l instance en cours d execution et les regles du groupe de securite}
+
+% ─────────────────────────────────────────────────────────────
+% 9. CONCLUSION & BILAN
+% ─────────────────────────────────────────────────────────────
+\section{Conclusion et Perspectives}
+
+Ce projet démontre avec succès la mise en œuvre pratique du **Shift-Right Testing** dans un cadre contraint :
+\begin{itemize}
+    \item \textbf{Robustesse} : Le déploiement canary permet d'exposer de nouvelles versions à un sous-ensemble restreint d'utilisateurs sans impacter l'ensemble du système.
+    \item \textbf{Contrôle dynamique} : L'utilisation des feature flags via Unleash permet d'activer, désactiver ou tester la résilience d'un composant en temps réel sans nécessiter de recompilation ni de redéploiement.
+    \item \textbf{Automatisation de la résilience} : Le contrôleur de rollback démontre qu'un mécanisme simple et autonome de supervision permet d'annuler une mise en production défaillante en quelques secondes sans interruption de service.
+    \item \textbf{Sobriété technique} : L'ensemble de la solution fonctionne sans la lourdeur d'un cluster Kubernetes ni d'une stack Prometheus/Grafana, tout en respectant scrupuleusement les contraintes d'une instance EC2 \texttt{t2.micro}.
+\end{itemize}
+
+\end{document}

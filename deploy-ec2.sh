@@ -44,11 +44,20 @@ if ! command -v docker-compose &> /dev/null; then
 fi
 
 # 5. Build and launch services
+echo "Setting script permissions..."
+chmod +x scripts/*.sh || true
+
 echo "Building and starting Docker containers..."
-sudo docker-compose up -d --build
+if docker compose version &> /dev/null; then
+    docker compose up -d --build
+else
+    sudo docker-compose up -d --build
+fi
 
 echo "=========================================="
 echo " Deployment Complete! "
-echo " Application running on port 80 (HTTP)    "
-echo " Backend API running on port 8080         "
+echo " Canary Router (Nginx) running on port 80  "
+echo " Backend V1 (Stable - 90%) on port 8080    "
+echo " Backend V2 (Canary - 10%) on port 8080    "
+echo " Unleash Feature Flags running on port 4242"
 echo "=========================================="

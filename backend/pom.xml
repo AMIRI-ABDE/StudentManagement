@@ -90,6 +90,19 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Actuator for health checks -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- Unleash Feature Flags -->
+		<dependency>
+			<groupId>io.getunleash</groupId>
+			<artifactId>unleash-client-java</artifactId>
+			<version>9.2.6</version>
+		</dependency>
 	</dependencies>
 
 	<build>
